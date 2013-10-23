@@ -103,6 +103,8 @@
             // Set to "cover", to make images cover all available space (requires
             // support for background-size="cover", which excludes IE < 9):
             stretchImages: false,
+            // fupport for only stretching the first image
+            onlyStretchFirst: false,
             // Toggle the controls on pressing the Return key:
             toggleControlsOnReturn: true,
             // Toggle the automatic slideshow interval on pressing the Space key:
@@ -892,11 +894,12 @@
             }, wait || 0);
         },
 
-        imageFactory: function (obj, callback) {
+        imageFactory: function (obj, callback, index) {
             var that = this,
                 img = this.imagePrototype.cloneNode(false),
                 url = obj,
                 backgroundSize = this.options.stretchImages,
+                onlyFirst = this.options.onlyStretchFirst,
                 called,
                 element,
                 callbackWrapper = function (event) {
@@ -931,6 +934,9 @@
             if (backgroundSize === true) {
                 backgroundSize = 'contain';
             }
+            if (onlyFirst && (index === 0)) {
+                backgroundSize = 'cover';
+            }
             backgroundSize = this.support.backgroundSize &&
                 this.support.backgroundSize[backgroundSize] && backgroundSize;
             if (backgroundSize) {
@@ -947,11 +953,11 @@
             return element;
         },
 
-        createElement: function (obj, callback) {
+        createElement: function (obj, callback, index) {
             var type = obj && this.getItemProperty(obj, this.options.typeProperty),
                 factory = (type && this[type.split('/')[0] + 'Factory']) ||
                     this.imageFactory,
-                element = obj && factory.call(this, obj, callback);
+                element = obj && factory.call(this, obj, callback, index);
             if (!element) {
                 element = this.elementPrototype.cloneNode(false);
                 this.setTimeout(callback, [{
@@ -973,7 +979,8 @@
                     $(this.slides[index]).addClass(this.options.slideLoadingClass);
                     this.slides[index].appendChild(this.createElement(
                         this.list[index],
-                        this.proxyListener
+                        this.proxyListener,
+                        index
                     ));
                 }
             }

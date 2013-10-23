@@ -49,7 +49,9 @@ $(function () {
         // Initialize the Gallery as image carousel:
         blueimp.Gallery(carouselLinks, {
             container: '#blueimp-image-carousel',
-            carousel: true
+            carousel: true,
+            onlyStretchFirst: true,
+            continuous: false
         });
     });
 
